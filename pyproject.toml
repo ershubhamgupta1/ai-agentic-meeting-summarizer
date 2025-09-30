@@ -1,0 +1,17 @@
+[project]
+name = "sample-app"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "agents>=1.4.0",
+    "dotenv>=0.9.9",
+    "gradio>=5.44.1",
+    "openai>=1.106.1",
+    "openai-agents>=0.2.11",
+    "openai-whisper",
+]
+
+[tool.uv.sources]
+openai-whisper = { git = "https://github.com/openai/whisper.git" }
