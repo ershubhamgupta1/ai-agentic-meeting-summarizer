@@ -8,6 +8,7 @@ dependencies = [
     "agents>=1.4.0",
     "dotenv>=0.9.9",
     "gradio>=5.44.1",
+    "gtts>=2.5.4",
     "openai>=1.106.1",
     "openai-agents>=0.2.11",
     "openai-whisper",

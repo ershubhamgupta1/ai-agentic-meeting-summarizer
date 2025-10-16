@@ -41,4 +41,14 @@ commands:
 
 1) Install dependencies on existing project: uv sync
 2) Install ffmpeg: brew install ffmpeg
-3) run project locally:  python3 ui.py
+3) Activate Virtual Environment: source .venv/bin/activate
+
+4) run project locally:  python3 ui.py
+
+5) to install and add package in toml file: uv add OpenAI
+
+
+
+TODO
+
+Add agent that get the transcripted text and try to improvise the textRefiningTool.py

@@ -1,4 +1,4 @@
-from tools import summaryTool, speechToTextTool
+from tools import summaryTool, speechToTextTool, textRefiningTool
 from utils.getMarkdown import generate_markdown_summary
 # Enhanced main.py with proper typing
 from typing import AsyncGenerator, Tuple, Optional, Dict, Any
@@ -34,9 +34,18 @@ async def summaryAgent(input_path: str) -> AsyncGenerator[Tuple[str, Optional[st
         
         # Summarize transcript
         logger.info("Summarizing transcript...")
-        yield "🧠 Summarizing transcript...", None
+        yield "🧠 Refining transcript...", None
         
-        summary = summaryTool(transcript_result["text"])
+        refined_transcript = textRefiningTool(transcript_result["text"])
+        yield "✅ Refinement completed.", None
+
+        logger.info(f"original transcript word count: {len(transcript_result['text'].split())}")
+        logger.info(f"Refined transcript word count: {len(refined_transcript.split())}")
+
+        logger.info(f"original transcript word : {transcript_result['text']}")
+        logger.info(f"Refined transcript word : {refined_transcript}")
+
+        summary = summaryTool(refined_transcript)
         yield "✅ Summary generation completed.", None
         
         # Generate markdown

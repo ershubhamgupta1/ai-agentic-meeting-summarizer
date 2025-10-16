@@ -22,9 +22,10 @@ def speechToTextTool(mp3File: str) -> Dict[str, Any]:
             logger.info("Loading Whisper model...")
             _model_cache[settings.WHISPER_MODEL] = whisper.load_model(settings.WHISPER_MODEL)
         
+        logger.info(f"model loaded!!!!!!!!!")
         model = _model_cache[settings.WHISPER_MODEL]
         transcript = model.transcribe(mp3File)
-        
+        logger.info(f"transcript: {transcript['text']}")
         return {
             "success": True,
             "text": transcript["text"],
