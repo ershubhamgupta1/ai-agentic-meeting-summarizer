@@ -1,13 +1,15 @@
-from tools import summaryTool, speechToTextTool, textRefiningTool
-from utils.getMarkdown import generate_markdown_summary
-# Enhanced main.py with proper typing
-from typing import AsyncGenerator, Tuple, Optional, Dict, Any
 import logging
+from collections.abc import AsyncGenerator
+
+# Enhanced main.py with proper typing
 from config.settings import validate_environment
+from tools import speechToTextTool, summaryTool, textRefiningTool
+from utils.getMarkdown import generate_markdown_summary
 
 logger = logging.getLogger(__name__)
 
-async def summaryAgent(input_path: str) -> AsyncGenerator[Tuple[str, Optional[str]], None]:
+
+async def summaryAgent(input_path: str) -> AsyncGenerator[tuple[str, str | None], None]:
     if not validate_environment():
         raise SystemExit("Missing required environment variables")
     """
@@ -21,25 +23,30 @@ async def summaryAgent(input_path: str) -> AsyncGenerator[Tuple[str, Optional[st
     """
     try:
         yield "🧠 Transcribe started...", None
-        
+
         # Transcribe audio
         logger.info(f"Transcribing audio file: {input_path}")
         transcript_result = speechToTextTool(input_path)
-        
+
         if not transcript_result.get("success", False):
-            yield f"❌ Transcription failed: {transcript_result.get('error', 'Unknown error')}", None
+            yield (
+                f"❌ Transcription failed: {transcript_result.get('error', 'Unknown error')}",
+                None,
+            )
             return
-            
+
         yield "✅ Transcription completed.", None
-        
+
         # Summarize transcript
         logger.info("Summarizing transcript...")
         yield "🧠 Refining transcript...", None
-        
+
         refined_transcript = textRefiningTool(transcript_result["text"])
         yield "✅ Refinement completed.", None
 
-        logger.info(f"original transcript word count: {len(transcript_result['text'].split())}")
+        logger.info(
+            f"original transcript word count: {len(transcript_result['text'].split())}"
+        )
         logger.info(f"Refined transcript word count: {len(refined_transcript.split())}")
 
         logger.info(f"original transcript word : {transcript_result['text']}")
@@ -47,15 +54,14 @@ async def summaryAgent(input_path: str) -> AsyncGenerator[Tuple[str, Optional[st
 
         summary = summaryTool(refined_transcript)
         yield "✅ Summary generation completed.", None
-        
+
         # Generate markdown
         marked_down_data = generate_markdown_summary(summary)
         yield "✅ Summary complete.", marked_down_data
-        
+
     except Exception as e:
         logger.error(f"Error in summaryAgent: {e}")
         yield f"❌ Error: {str(e)}", None
-
 
 
 # async def summaryAgent(input) -> str:

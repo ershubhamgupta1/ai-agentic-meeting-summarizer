@@ -1,4 +1,5 @@
 import os
+
 from gtts import gTTS
 
 # 1. Create the folder if it doesn't exist
@@ -60,7 +61,7 @@ Eve: Sounds good. I’ll make sure the front-end backlog reflects the regression
 Alice: Perfect. Alright, that wraps up today’s retro. Thanks everyone — let’s follow up once the initial fixes are done.
 """
 # 3. Generate MP3 with gTTS
-tts = gTTS(text=meeting_script_2, lang='en')
+tts = gTTS(text=meeting_script_2, lang="en")
 
 # 4. Define path and save
 output_path = os.path.join(output_dir, "meeting_2.mp3")

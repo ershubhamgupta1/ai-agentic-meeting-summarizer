@@ -1,19 +1,18 @@
-from typing import Union
-from pydantic import BaseModel
-from typing import List, Optional
 from models.meeting_schema import MeetingSummary
 
 
-def generate_markdown_summary(summary: Union[MeetingSummary, dict]) -> str:
+def generate_markdown_summary(summary: MeetingSummary | dict) -> str:
     if isinstance(summary, dict) and "properties" in summary:
-            summary_obj = MeetingSummary(**summary["properties"])
+        summary_obj = MeetingSummary(**summary["properties"])
     elif isinstance(summary, dict):
-            summary_obj = MeetingSummary(**summary)        
-    
-    def format_list(items: List[str]) -> str:
-        return "\n".join(f"- {item}" for item in items) if items else "**Not Specified**"
+        summary_obj = MeetingSummary(**summary)
 
-    def format_str(item: Optional[str]) -> str:
+    def format_list(items: list[str]) -> str:
+        return (
+            "\n".join(f"- {item}" for item in items) if items else "**Not Specified**"
+        )
+
+    def format_str(item: str | None) -> str:
         return item if item else "**Not Specified**"
 
     md = f"""
@@ -71,8 +70,9 @@ def generate_markdown_summary(summary: Union[MeetingSummary, dict]) -> str:
 ## 🛠️ Improvements
 {format_list(summary_obj.improvements)}
 """
-    return md;
+    return md
     # return Markdown(md)
+
 
 # 🧪 Example usage:
 # display(generate_markdown_summary(summary_data))

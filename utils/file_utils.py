@@ -1,19 +1,23 @@
 # Add to utils/file_utils.py
-import os
-from config.settings import settings
 import logging
+import os
+
+from config.settings import settings
+
 logger = logging.getLogger(__name__)
+
 
 def validate_audio_file(file_path: str) -> bool:
     """Validate audio file before processing."""
     if not os.path.exists(file_path):
         return False
-    
+
     if os.path.getsize(file_path) > settings.MAX_FILE_SIZE:
         return False
-    
+
     _, ext = os.path.splitext(file_path)
     return ext.lower() in settings.SUPPORTED_FORMATS
+
 
 def cleanup_temp_file(file_path: str) -> None:
     """Safely remove temporary files."""

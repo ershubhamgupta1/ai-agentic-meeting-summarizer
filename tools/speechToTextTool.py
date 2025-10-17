@@ -1,8 +1,9 @@
-from dotenv import load_dotenv
 import logging
-from typing import Dict, Any
 import os
+from typing import Any
+
 import whisper
+from dotenv import load_dotenv
 
 from config.settings import settings
 
@@ -12,17 +13,20 @@ load_dotenv()  # Load environment variables from .env
 _model_cache = {}
 logger = logging.getLogger(__name__)
 
-def speechToTextTool(mp3File: str) -> Dict[str, Any]:
+
+def speechToTextTool(mp3File: str) -> dict[str, Any]:
     """Tool to convert mp3 file to text with comprehensive error handling."""
     try:
         if not os.path.exists(mp3File):
             raise FileNotFoundError(f"Audio file not found: {mp3File}")
-        
+
         if settings.WHISPER_MODEL not in _model_cache:
             logger.info("Loading Whisper model...")
-            _model_cache[settings.WHISPER_MODEL] = whisper.load_model(settings.WHISPER_MODEL)
-        
-        logger.info(f"model loaded!!!!!!!!!")
+            _model_cache[settings.WHISPER_MODEL] = whisper.load_model(
+                settings.WHISPER_MODEL
+            )
+
+        logger.info("model loaded!!!!!!!!!")
         model = _model_cache[settings.WHISPER_MODEL]
         transcript = model.transcribe(mp3File)
         logger.info(f"transcript: {transcript['text']}")
@@ -30,7 +34,7 @@ def speechToTextTool(mp3File: str) -> Dict[str, Any]:
             "success": True,
             "text": transcript["text"],
             "language": transcript.get("language", "unknown"),
-            "duration": transcript.get("duration", 0)
+            "duration": transcript.get("duration", 0),
         }
     except FileNotFoundError as e:
         logger.error(f"File error: {e}")
