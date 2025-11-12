@@ -5,17 +5,28 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "agents>=1.4.0",
-    "dotenv>=0.9.9",
-    "gradio>=5.44.1",
+    "python-dotenv>=0.9.9",
+    "pydantic>=2.0.0",
+    "gradio>=4.44.1",
     "gtts>=2.5.4",
     "openai>=1.106.1",
-    "openai-agents>=0.2.11",
     "openai-whisper",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit>=3.7.0",
+    "ruff>=0.6.0",
 ]
 
 [tool.uv.sources]
 openai-whisper = { git = "https://github.com/openai/whisper.git" }
+
+[tool.uv.scripts]
+# macOS/Linux setup
+setup-unix = "bash scripts/setup.sh"
+# Windows setup
+setup-win = "setup.cmd"
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.

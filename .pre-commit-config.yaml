@@ -1,0 +1,12 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      # Check formatting only (no file writes). Fails if reformatting is needed.
+      - id: ruff-format
+        args: ["--check"]
+
+      # Lint code and fail on diagnostics. No auto-fixes to keep commits explicit.
+      - id: ruff
+        args: ["--config=pyproject.toml"]
+
