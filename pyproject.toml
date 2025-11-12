@@ -27,6 +27,8 @@ openai-whisper = { git = "https://github.com/openai/whisper.git" }
 setup-unix = "bash scripts/setup.sh"
 # Windows setup
 setup-win = "setup.cmd"
+# Launch the Gradio UI locally
+start = "python3 ui.py"
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
