@@ -7,6 +7,38 @@ sdk_version: 5.44.1
 
 
 
+## Quick Setup
+
+1. Install dependencies:
+   ```bash
+   uv sync
+   ```
+   (This creates the virtual environment and installs all dependencies from `pyproject.toml` and `uv.lock`)
+
+2. Activate the virtual environment:
+   ```bash
+   source .venv/bin/activate
+   ```
+   (macOS/Linux) or on Windows:
+   ```powershell
+   .venv\Scripts\activate
+   ```
+
+3. Alternative setup (macOS / Linux):
+   ```bash
+   bash scripts/setup.sh
+   ```
+   Alternative setup (Windows - CMD or PowerShell):
+   ```powershell
+   setup.cmd
+   ```
+   (This runs `scripts/setup.ps1` with the necessary execution policy bypass.)
+
+4. Launch the Gradio UI:
+   ```bash
+   python3 ui.py
+   ```
+
 Steps to create app from scratch
 
 
@@ -39,13 +71,11 @@ Notes
 
 commands:
 
-1) Install dependencies on existing project: uv sync
-2) Install ffmpeg: brew install ffmpeg
-3) Activate Virtual Environment: source .venv/bin/activate
-
-4) run project locally:  python3 ui.py
-
-5) to install and add package in toml file: uv add OpenAI
+- Install dependencies on existing project: `uv sync`
+- Install ffmpeg: `brew install ffmpeg`
+- Activate Virtual Environment: `source .venv/bin/activate`
+- Run project locally: `python3 ui.py`
+- Install and add package in toml file: `uv add OpenAI`
 
 
 
