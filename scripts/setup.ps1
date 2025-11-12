@@ -31,18 +31,18 @@ function Install-FFmpeg {
 function Install-PythonDeps {
     Write-Host 'Installing Python dependencies...'
     if (Ensure-Command uv) {
-        uv pip install --upgrade pip
+        # Prefer uv sync if pyproject.toml exists (creates venv and installs deps)
         if (Test-Path 'pyproject.toml') {
-            uv pip install .[dev]
+            uv sync
         } elseif (Test-Path 'requirements.txt') {
             uv pip install -r requirements.txt
         }
     } else {
         py -3 -m pip install --upgrade pip
-        if (Test-Path 'pyproject.toml') {
-            py -3 -m pip install .[dev]
-        } elseif (Test-Path 'requirements.txt') {
+        if (Test-Path 'requirements.txt') {
             py -3 -m pip install -r requirements.txt
+        } else {
+            throw 'No requirements.txt found. Please create one or install dependencies manually.'
         }
     }
 }

@@ -9,19 +9,35 @@ sdk_version: 5.44.1
 
 ## Quick Setup
 
-- macOS / Linux:
-  ```bash
-  bash scripts/setup.sh
-  ```
-- Windows (CMD or PowerShell):
-  ```powershell
-  setup.cmd
-  ```
-  (This runs `scripts/setup.ps1` with the necessary execution policy bypass.)
-- After setup completes, launch the Gradio UI:
-  ```bash
-  python3 ui.py
-  ```
+1. Install dependencies:
+   ```bash
+   uv sync
+   ```
+   (This creates the virtual environment and installs all dependencies from `pyproject.toml` and `uv.lock`)
+
+2. Activate the virtual environment:
+   ```bash
+   source .venv/bin/activate
+   ```
+   (macOS/Linux) or on Windows:
+   ```powershell
+   .venv\Scripts\activate
+   ```
+
+3. Alternative setup (macOS / Linux):
+   ```bash
+   bash scripts/setup.sh
+   ```
+   Alternative setup (Windows - CMD or PowerShell):
+   ```powershell
+   setup.cmd
+   ```
+   (This runs `scripts/setup.ps1` with the necessary execution policy bypass.)
+
+4. Launch the Gradio UI:
+   ```bash
+   python3 ui.py
+   ```
 
 Steps to create app from scratch
 

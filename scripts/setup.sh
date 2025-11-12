@@ -45,19 +45,19 @@ install_ffmpeg() {
 install_python_deps() {
   echo "Installing Python dependencies..."
   if ensure_command uv; then
-    # Prefer uv if available
-    uv pip install --upgrade pip
+    # Prefer uv sync if pyproject.toml exists (creates venv and installs deps)
     if [ -f "pyproject.toml" ]; then
-      uv pip install .[dev]
+      uv sync
     elif [ -f "requirements.txt" ]; then
       uv pip install -r requirements.txt
     fi
   else
     python3 -m pip install --upgrade pip
-    if [ -f "pyproject.toml" ]; then
-      python3 -m pip install .[dev]
-    elif [ -f "requirements.txt" ]; then
+    if [ -f "requirements.txt" ]; then
       python3 -m pip install -r requirements.txt
+    else
+      echo "No requirements.txt found. Please create one or install dependencies manually."
+      exit 1
     fi
   fi
 }
