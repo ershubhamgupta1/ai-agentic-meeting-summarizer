@@ -19,10 +19,6 @@ sdk_version: 5.44.1
    ```bash
    source .venv/bin/activate
    ```
-   (macOS/Linux) or on Windows:
-   ```powershell
-   .venv\Scripts\activate
-   ```
 
 3. Alternative setup (macOS / Linux):
    ```bash
@@ -76,6 +72,24 @@ commands:
 - Activate Virtual Environment: `source .venv/bin/activate`
 - Run project locally: `python3 ui.py`
 - Install and add package in toml file: `uv add OpenAI`
+
+Ruff linting and formatting:
+
+- Check for lint issues: `ruff check .`
+- Auto-fix lint issues: `ruff check --fix .`
+- Check formatting: `ruff format --check`
+- Auto-format code: `ruff format`
+- Check lint for one file: `ruff check path/to/file.py`
+- Auto-fix lint for one file: `ruff check --fix path/to/file.py`
+- Check formatting for one file: `ruff format --check path/to/file.py`
+- Auto-format one file: `ruff format path/to/file.py`
+
+Lint vs. format:
+
+- **Linting** finds code-quality and correctness issues, such as unused imports or unreachable branches.  
+  *Example: `ruff check .` highlights an unused variable so you can remove it.*
+- **Formatting** enforces consistent styling choices—spacing, quotes, line length—without changing behavior.  
+  *Example: `ruff format` rewrites `x=1+2` to `x = 1 + 2` while keeping the same result.*
 
 
 
