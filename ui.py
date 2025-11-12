@@ -9,6 +9,7 @@ import tempfile
 from collections.abc import AsyncGenerator
 
 import gradio as gr
+from dotenv import load_dotenv
 
 from config.settings import settings
 from main import summaryAgent
@@ -17,6 +18,9 @@ from utils.logging_config import setup_logging
 
 # Setup logging
 logger = logging.getLogger(__name__)
+
+# Load environment variables for local runs
+load_dotenv()
 
 
 class ProgressTracker:
@@ -323,15 +327,19 @@ def main():
 
         # Create and launch the UI
         demo = create_ui()
-        demo.launch(
-            share=False,
-            server_name="127.0.0.1",
-            server_port=7860,
-            show_error=True,
-            quiet=False,
-            prevent_thread_lock=False,
-            inbrowser=False,
-        )
+        demo.queue()
+
+        launch_kwargs = {
+            "share": settings.GRADIO_SHARE,
+            "server_name": "0.0.0.0" if settings.RUNNING_IN_SPACE else "127.0.0.1",
+            "server_port": settings.PORT,
+            "show_error": True,
+            "quiet": False,
+            "prevent_thread_lock": False,
+            "inbrowser": False,
+        }
+
+        demo.launch(**launch_kwargs)
 
     except Exception as e:
         logger.error(f"Failed to start application: {e}")

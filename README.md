@@ -20,7 +20,13 @@ sdk_version: 5.44.1
    source .venv/bin/activate
    ```
 
-3. Alternative setup (macOS / Linux):
+3. Copy the example environment variables and update them:
+   ```bash
+   cp env.example .env
+   ```
+   Fill in `OPENAI_API_KEY` and adjust any other values as needed.
+
+4. Alternative setup (macOS / Linux):
    ```bash
    bash scripts/setup.sh
    ```
@@ -30,10 +36,19 @@ sdk_version: 5.44.1
    ```
    (This runs `scripts/setup.ps1` with the necessary execution policy bypass.)
 
-4. Launch the Gradio UI:
+5. Launch the Gradio UI:
    ```bash
    python3 ui.py
    ```
+
+Environment variables:
+
+- `OPENAI_API_KEY` (required) – OpenAI credentials used by the summarizer.
+- `OPENAI_MODEL`, `OPENAI_TEMPERATURE`, `WHISPER_MODEL` – optional model overrides.
+- `MAX_FILE_SIZE` – max upload size in MB (defaults to 50).
+- `PORT` – port for the Gradio server (defaults to 7860).
+- `GRADIO_SHARE` – set `true` to generate a share link when running locally.
+- `LOG_LEVEL`, `LOG_FILE` – optional logging configuration.
 
 Steps to create app from scratch
 
@@ -72,6 +87,8 @@ commands:
 - Activate Virtual Environment: `source .venv/bin/activate`
 - Run project locally: `python3 ui.py`
 - Install and add package in toml file: `uv add OpenAI`
+- Log in to Hugging Face: `huggingface-cli login`
+- Deploy to Hugging Face Spaces: `gradio deploy`
 
 Ruff linting and formatting:
 

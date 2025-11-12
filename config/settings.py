@@ -23,7 +23,20 @@ class Settings:
     SUPPORTED_FORMATS: list = [".mp3", ".wav", ".m4a"]
 
     # UI Settings
-    GRADIO_SHARE: bool = os.getenv("GRADIO_SHARE", "false").lower() == "true"
+    PORT: int = int(os.getenv("PORT", "7860"))
+    _running_in_space_env = os.getenv("RUNNING_IN_SPACE", "")
+    RUNNING_IN_SPACE: bool = _running_in_space_env.lower() not in {
+        "",
+        "0",
+        "false",
+        "no",
+    }
+    _gradio_share_env = os.getenv("GRADIO_SHARE")
+    GRADIO_SHARE: bool = (
+        _gradio_share_env.lower() == "true"
+        if _gradio_share_env is not None
+        else not RUNNING_IN_SPACE
+    )
 
 
 # Add to config/settings.py
@@ -39,3 +52,9 @@ def validate_environment() -> bool:
 
 
 settings = Settings()
+logger.info(
+    "Settings loaded (RUNNING_IN_SPACE=%s, GRADIO_SHARE=%s, PORT=%s)",
+    settings.RUNNING_IN_SPACE,
+    settings.GRADIO_SHARE,
+    settings.PORT,
+)

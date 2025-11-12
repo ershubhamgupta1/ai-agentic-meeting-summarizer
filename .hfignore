@@ -1,0 +1,11 @@
+.venv
+__pycache__/
+data/
+*.mp4
+*.wav
+.DS_Store
+.git
+.env
+.env.local
+.env.*
+.ruff_cache
