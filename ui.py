@@ -12,7 +12,7 @@ import gradio as gr
 from dotenv import load_dotenv
 
 from config.settings import settings
-from main import summaryAgent
+from main import summaryAgent, voiceRecognitionAgent
 from utils.file_utils import cleanup_temp_file, validate_audio_file
 from utils.logging_config import setup_logging
 
@@ -127,7 +127,7 @@ async def gradio_wrapper(
     """
     final_summary = None
     progress_tracker = ProgressTracker()
-
+    logger.info(f"audio_path============{audio_path}")
     try:
         # Validate input file
         if not audio_path:
@@ -201,6 +201,88 @@ async def gradio_wrapper(
             logger.warning(f"Failed to cleanup file {audio_path}: {e}")
 
 
+async def voice_recognition_wrapper(
+    comparison_audio_path: str,
+    progress=gr.Progress(),
+) -> AsyncGenerator[tuple[str, str | None], None]:
+    """Run the voice recognition agent with progress feedback."""
+    progress_tracker = ProgressTracker(total_steps=3)
+    progress_tracker.steps = [
+        "Preparing inputs...",
+        "Processing audio...",
+        "Identifying speaker...",
+    ]
+
+    try:
+        if not comparison_audio_path.name:
+            error_html = UIComponents.get_error_html(
+                "Please upload the audio file you want to identify."
+            )
+            yield error_html, None
+            return
+
+        step_name, step_num = progress_tracker.next_step()
+        progress_html = UIComponents.get_progress_html(
+            step_num, progress_tracker.total_steps, step_name
+        )
+        status_html = UIComponents.get_status_html(
+            "🚀 Starting voice recognition workflow..."
+        )
+        yield progress_html + status_html, None
+
+        result = await voiceRecognitionAgent(
+            comparison_audio_path.name,
+        )
+
+        events = result.get("events", [])
+        if events:
+            for index, event in enumerate(events, start=1):
+                step_name, step_num = (
+                    progress_tracker.next_step()
+                    if progress_tracker.current_step < progress_tracker.total_steps
+                    else (f"Event {index}", progress_tracker.current_step)
+                )
+                progress_html = UIComponents.get_progress_html(
+                    min(step_num, progress_tracker.total_steps),
+                    progress_tracker.total_steps,
+                    step_name,
+                )
+                status_html = UIComponents.get_status_html(event)
+                yield progress_html + status_html, None
+
+        if result.get("success"):
+            speakers = result.get("identified_speakers", [])
+
+            final_html = UIComponents.get_success_html(
+                f"Identified {len(speakers)} speaker(s)."
+            )
+
+            message_lines = [
+                "### Voice Recognition Result",
+                f"- **Total Speakers:** {len(speakers)}",
+                "- **Identified Speakers:**",
+            ]
+
+            for spk in speakers:
+                message_lines.append(f"  - `{spk}`")
+
+            yield final_html, "\n".join(message_lines)
+        else:
+            error_message = result.get("error", "Speaker not recognized.")
+            error_html = UIComponents.get_error_html(error_message)
+            message_lines = [
+                "### Voice Recognition Result",
+                # f"- **Speaker Name:** `{speaker_name.strip()}`",
+                f"- **Outcome:** {error_message}",
+            ]
+            yield error_html, "\n".join(message_lines)
+
+    except Exception as e:
+        logger.error(f"Error in voice_recognition_wrapper: {e}")
+        error_html = UIComponents.get_error_html(f"An unexpected error occurred: {e}")
+        yield error_html, None
+
+
 def create_ui() -> gr.Blocks:
     """Create and configure the Gradio UI interface."""
 
@@ -249,64 +331,93 @@ def create_ui() -> gr.Blocks:
         **Supported formats:** MP3, WAV, M4A | **Max file size:** 50MB
         """)
 
-        with gr.Row():
-            with gr.Column(scale=1):
-                # Input section
-                gr.Markdown("### 📁 Upload Audio File")
-                input_file = gr.File(
-                    file_types=[".mp3", ".wav", ".m4a"],
-                    label="Choose your meeting recording",
-                    elem_classes=["file-upload"],
+        with gr.Tabs():
+            with gr.TabItem("Meeting Summarizer"):
+                with gr.Row():
+                    with gr.Column(scale=1):
+                        # Input section
+                        gr.Markdown("### 📁 Upload Audio File")
+                        input_file = gr.File(
+                            file_types=[".mp3", ".wav", ".m4a"],
+                            label="Choose your meeting recording",
+                            elem_classes=["file-upload"],
+                        )
+
+                        # Action button
+                        summarize_btn = gr.Button(
+                            "🚀 Generate Summary",
+                            variant="primary",
+                            elem_classes=["btn-primary"],
+                            size="lg",
+                        )
+
+                        # Progress and status display
+                        gr.Markdown("### 📊 Progress")
+                        progress_and_status = gr.HTML(
+                            value="<p style='color: #6b7280; text-align: center; margin: 20px 0;'>Ready to process your audio file...</p>"
+                        )
+
+                    with gr.Column(scale=2):
+                        # Output section
+                        gr.Markdown("### 📋 Meeting Summary")
+                        formatted_output = gr.Markdown(
+                            label="",
+                            elem_classes=["markdown-output"],
+                            value="*Your meeting summary will appear here after processing...*",
+                        )
+
+                gr.Markdown("""
+                ---
+                <div style="text-align: center; color: #6b7280; font-size: 14px; margin-top: 20px;">
+                    <p>💡 <strong>Tip:</strong> For best results, use clear audio recordings with minimal background noise.</p>
+                    <p>🔒 Your files are processed securely and are not stored permanently.</p>
+                </div>
+                """)
+
+                summarize_btn.click(
+                    fn=gradio_wrapper,
+                    inputs=input_file,
+                    outputs=[progress_and_status, formatted_output],
+                    show_progress=False,
                 )
 
-                # Action button
-                summarize_btn = gr.Button(
-                    "🚀 Generate Summary",
+                input_file.change(
+                    fn=lambda: (
+                        "<p style='color: #6b7280; text-align: center; margin: 20px 0;'>Ready to process your audio file...</p>",
+                        "*Your meeting summary will appear here after processing...*",
+                    ),
+                    outputs=[progress_and_status, formatted_output],
+                )
+
+            with gr.TabItem("Voice Recognition"):
+                gr.Markdown("### 🔍 Identify Speaker in New Audio")
+                voice_comparison_file = gr.File(
+                    file_types=[".mp3", ".wav", ".m4a"],
+                    label="Audio to identify",
+                    elem_classes=["file-upload"],
+                )
+                voice_recognize_btn = gr.Button(
+                    "🔍 Identify Speaker",
                     variant="primary",
                     elem_classes=["btn-primary"],
                     size="lg",
                 )
-
-                # Progress and status display
-                gr.Markdown("### 📊 Progress")
-                progress_and_status = gr.HTML(
-                    value="<p style='color: #6b7280; text-align: center; margin: 20px 0;'>Ready to process your audio file...</p>"
+                voice_progress = gr.HTML(
+                    value="<p style='color: #6b7280; text-align: center; margin: 20px 0;'>Ready to run voice recognition...</p>"
                 )
-
-            with gr.Column(scale=2):
-                # Output section
-                gr.Markdown("### 📋 Meeting Summary")
-                formatted_output = gr.Markdown(
-                    label="",
+                voice_output = gr.Markdown(
+                    value="*Voice recognition results will appear here after processing...*",
                     elem_classes=["markdown-output"],
-                    value="*Your meeting summary will appear here after processing...*",
                 )
 
-        # Footer with information
-        gr.Markdown("""
-        ---
-        <div style="text-align: center; color: #6b7280; font-size: 14px; margin-top: 20px;">
-            <p>💡 <strong>Tip:</strong> For best results, use clear audio recordings with minimal background noise.</p>
-            <p>🔒 Your files are processed securely and are not stored permanently.</p>
-        </div>
-        """)
-
-        # Event handlers
-        summarize_btn.click(
-            fn=gradio_wrapper,
-            inputs=input_file,
-            outputs=[progress_and_status, formatted_output],
-            show_progress=False,
-        )
-
-        # Clear outputs when new file is uploaded
-        input_file.change(
-            fn=lambda: (
-                "<p style='color: #6b7280; text-align: center; margin: 20px 0;'>Ready to process your audio file...</p>",
-                "*Your meeting summary will appear here after processing...*",
-            ),
-            outputs=[progress_and_status, formatted_output],
-        )
+                voice_recognize_btn.click(
+                    fn=voice_recognition_wrapper,
+                    inputs=[
+                        voice_comparison_file,
+                    ],
+                    outputs=[voice_progress, voice_output],
+                    show_progress=False,
+                )
 
     return demo
 
