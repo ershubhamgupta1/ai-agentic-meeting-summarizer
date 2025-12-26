@@ -3,14 +3,18 @@ Optimized UI module for the Agentic Summarizer App.
 Features improved error handling, progress tracking, and user experience.
 """
 
+from utils.hf_compat import patch_hf_hub_download
+
+# ruff: noqa: E402
+patch_hf_hub_download()  # 🔥 MUST be before pyannote imports
+
 import logging
 import os
 import tempfile
 from collections.abc import AsyncGenerator
-from functools import wraps
 
+# from functools import wraps
 import gradio as gr
-import huggingface_hub
 from dotenv import load_dotenv
 
 from config.settings import settings
@@ -20,32 +24,8 @@ from utils.logging_config import setup_logging
 
 load_dotenv()
 
-# --- HF compatibility patch (DO NOT REMOVE) ---
-
-
-os.environ["HF_TOKEN"] = os.getenv("HUGGINGFACE_HUB_TOKEN")
-
-_original_hf_hub_download = huggingface_hub.hf_hub_download
-
-
-@wraps(_original_hf_hub_download)
-def _hf_hub_download_compat(*args, **kwargs):
-    # pyannote passes use_auth_token, HF hub removed it
-    if "use_auth_token" in kwargs and "token" not in kwargs:
-        kwargs["token"] = kwargs.pop("use_auth_token")
-    else:
-        kwargs.pop("use_auth_token", None)
-    return _original_hf_hub_download(*args, **kwargs)
-
-
-huggingface_hub.hf_hub_download = _hf_hub_download_compat
-# ------------------------------------------------
-
-
 # Setup logging
 logger = logging.getLogger(__name__)
-
-# Load environment variables for local runs
 
 
 class ProgressTracker:
