@@ -7,7 +7,7 @@ from pydub import AudioSegment
 
 logger = logging.getLogger(__name__)
 
-pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization")
+pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1")
 
 whisper_model = whisper.load_model("small.en")
 
