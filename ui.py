@@ -3,10 +3,13 @@ Optimized UI module for the Agentic Summarizer App.
 Features improved error handling, progress tracking, and user experience.
 """
 
+from suppress_warnings import suppress_third_party_warnings
 from utils.hf_compat import patch_hf_hub_download
 
 # ruff: noqa: E402
 patch_hf_hub_download()  # 🔥 MUST be before pyannote imports
+# ruff: noqa: E402
+suppress_third_party_warnings()
 
 import logging
 import os
