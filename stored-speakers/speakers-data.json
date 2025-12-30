@@ -1,0 +1,12 @@
+{
+    "data": [
+        {
+            "speakerName": "Tom",
+            "fileName": "tom-speaker.wav"
+        },
+        {
+            "speakerName": "Shubham",
+            "fileName": "shubham-speaker.wav"
+        }
+    ]
+}

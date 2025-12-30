@@ -1,4 +1,4 @@
-from .speakerEmbeddingTool import speakerIdentificationTool
+from .speakerEmbeddingTool import addSpeakerInStoreTool, speakerIdentificationTool
 from .speechToTextTool import speechToTextTool
 from .summaryTool import summaryTool
 from .textRefiningTool import textRefiningTool
@@ -8,4 +8,5 @@ __all__ = [
     "summaryTool",
     "textRefiningTool",
     "speakerIdentificationTool",
+    "addSpeakerInStoreTool",
 ]

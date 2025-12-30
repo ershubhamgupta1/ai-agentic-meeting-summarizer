@@ -60,6 +60,30 @@ Environment variables:
 - `GRADIO_SHARE` – set `true` to generate a share link when running locally.
 - `LOG_LEVEL`, `LOG_FILE` – optional logging configuration.
 
+
+## Scripts
+
+   ### `load-stored-speakers.py`
+
+      This script is used to **load and register pre-defined speakers** into the system.  
+      It reads speaker metadata from `speakers-data.json` and processes each speaker **one by one** to prepare them for speaker identification.
+
+      #### What this script does
+      - Reads the `speakers-data.json` file
+      - Iterates through each speaker entry sequentially
+      - Loads the associated audio file for each speaker
+      - Registers / stores speaker information for later identification
+
+      #### When to run this script
+      - During initial project setup
+      - When adding new known speakers
+      - When rebuilding the speaker store from scratch
+
+      #### How to run
+      ```bash
+      python scripts/load-stored-speakers.py
+
+
 Steps to create app from scratch
 
 

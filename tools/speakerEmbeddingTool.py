@@ -65,7 +65,7 @@ class SpeakerStore:
 # =========================
 # EMBEDDING MODEL
 # =========================
-
+store = SpeakerStore()
 embedding_model = Inference("pyannote/embedding", window="whole")
 
 
@@ -137,7 +137,6 @@ def identify_single_audio_chunk(
 
 
 def diarize(audio_path):
-    logger.info("Enter in dial")
     diarization = pipeline(audio_path)
     results = []  # 👈 this is what we will return
     audio = AudioSegment.from_mp3(audio_path)
@@ -184,7 +183,6 @@ def millisec(timeStr):
 def speakerIdentificationTool(audio_path):
     audio, sr = torchaudio.load(audio_path)
     identified_speakers = set()
-    store = SpeakerStore()
     events = []
     try:
         transcribedAudio = diarize(audio_path)
@@ -219,3 +217,19 @@ def speakerIdentificationTool(audio_path):
         },
         "events": events,
     }
+
+
+async def addSpeakerInStoreTool(audio_path, speakerName):
+    try:
+        audio, sr = torchaudio.load(audio_path)
+        transcribedAudio = diarize(audio_path)
+        audioChunk = transcribedAudio[0]
+        if audioChunk:
+            embedding = audiosegment_to_embedding(audioChunk["chunk"])
+            store.add_embedding(speakerName, embedding)
+
+    except Exception as e:
+        logger.error(f"Error in addSpeakerInStoreTool: {e}")
+        return {"success": False, "error": str(e)}
+
+    return {"success": True}

@@ -1,6 +1,7 @@
 # Add to utils/file_utils.py
 import logging
 import os
+from pathlib import Path
 
 from config.settings import settings
 
@@ -26,3 +27,22 @@ def cleanup_temp_file(file_path: str) -> None:
             os.remove(file_path)
     except Exception as e:
         logger.warning(f"Failed to cleanup file {file_path}: {e}")
+
+
+def read_folder(folder_path: Path) -> list[Path]:
+    """Read a folder and return all files inside it."""
+    if not folder_path.exists():
+        logger.error(f"Folder does not exist: {folder_path}")
+        return []
+
+    files = [f for f in folder_path.iterdir() if f.is_file()]
+    logger.info(f"Found {len(files)} files in {folder_path}")
+    return files
+
+
+def load_file(file_path: Path) -> str:
+    """Load a single file."""
+    logger.info(f"Loading file: {file_path.name}")
+
+    with open(file_path, encoding="utf-8") as f:
+        return f.read()
