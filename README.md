@@ -46,8 +46,10 @@ sdk_version: 5.44.1
 
 5. Launch the Gradio UI:
    ```bash
-   python3 ui.py
+   python ui.py
    ```
+
+
 
 Environment variables:
 
@@ -100,14 +102,14 @@ commands:
 
 Ruff linting and formatting:
 
-- Check for lint issues: `ruff check .`
-- Auto-fix lint issues: `ruff check --fix .`
-- Check formatting: `ruff format --check`
-- Auto-format code: `ruff format`
-- Check lint for one file: `ruff check path/to/file.py`
-- Auto-fix lint for one file: `ruff check --fix path/to/file.py`
-- Check formatting for one file: `ruff format --check path/to/file.py`
-- Auto-format one file: `ruff format path/to/file.py`
+- Check for lint issues: `uv run ruff check .`
+- Auto-fix lint issues: ` uv run ruff check --fix .`
+- Check formatting: `uv run ruff format --check`
+- Auto-format code: `uv run ruff format`
+- Check lint for one file: `uv run ruff check path/to/file.py`
+- Auto-fix lint for one file: `uv run ruff check --fix path/to/file.py`
+- Check formatting for one file: `uv run ruff format --check path/to/file.py`
+- Auto-format one file: `uv run ruff format path/to/file.py`
 
 Lint vs. format:
 

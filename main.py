@@ -11,18 +11,14 @@ import torchaudio
 # Enhanced main.py with proper typing
 from config.settings import validate_environment
 from tools import (
-    SpeakerStore,
-    audiosegment_to_embedding,
-    identify_single_audio_chunk,
+    speakerIdentificationTool,
     speechToTextTool,
     summaryTool,
     textRefiningTool,
 )
-from utils.diarization import diarize
 from utils.getMarkdown import generate_markdown_summary
 
 logger = logging.getLogger(__name__)
-store = SpeakerStore()
 
 
 async def summaryAgent(input_path: str) -> AsyncGenerator[tuple[str, str | None], None]:
@@ -81,41 +77,7 @@ async def summaryAgent(input_path: str) -> AsyncGenerator[tuple[str, str | None]
 
 
 async def voiceRecognitionAgent(input_path: str) -> bool:
-    audio, sr = torchaudio.load(input_path)
-    identified_speakers = set()
-    events = []
-
-    try:
-        transcribedAudio = diarize(input_path)
-        if transcribedAudio:
-            for audioChunk in transcribedAudio:
-                identified_speaker, score = identify_single_audio_chunk(
-                    audioChunk["chunk"], store
-                )
-                if identified_speaker:
-                    final_speaker = identified_speaker
-                    events.append(
-                        f"🗣 Identified speaker: {identified_speaker} (confidence {score:.2f})"
-                    )
-                else:
-                    final_speaker = audioChunk["speaker"]
-                    embedding = audiosegment_to_embedding(audioChunk["chunk"])
-                    store.add_embedding(final_speaker, embedding)
-                    events.append(f"🆕 Learned new speaker: {final_speaker}")
-
-                identified_speakers.add(final_speaker)
-        return {
-            "success": True,
-            "identified_speakers": sorted(identified_speakers),
-            "details": {
-                "total_speakers": len(identified_speakers),
-            },
-            "events": events,
-        }
-
-    except Exception as e:
-        logger.error(f"Error in voiceRecognitionAgent: {e}")
-        return {"success": False, "error": str(e)}
+    return speakerIdentificationTool(input_path)
 
 
 def save_segment(audio, sr, start, end):

@@ -4,7 +4,9 @@ from pathlib import Path
 
 import numpy as np
 import torch
-from pyannote.audio import Inference
+import torchaudio
+import whisper
+from pyannote.audio import Inference, Pipeline
 from pydub import AudioSegment
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -13,6 +15,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 # =========================
 logger = logging.getLogger(__name__)
 SPEAKER_STORE_PATH = Path("speaker_store.pkl")
+
+pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1")
+
+whisper_model = whisper.load_model("small.en")
+
 
 # similarity threshold (tune later)
 SIMILARITY_THRESHOLD = 0.75
@@ -127,3 +134,88 @@ def identify_single_audio_chunk(
 
     embedding = audiosegment_to_embedding(chunk)
     return identify_speaker(embedding, store)
+
+
+def diarize(audio_path):
+    logger.info("Enter in dial")
+    diarization = pipeline(audio_path)
+    results = []  # 👈 this is what we will return
+    audio = AudioSegment.from_mp3(audio_path)
+    audio = audio.set_frame_rate(16000)
+
+    for turn, _, speaker in diarization.itertracks(yield_label=True):
+        start = int(turn.start * 1000)
+        end = int(turn.end * 1000)
+
+        if end <= start:
+            continue
+
+        chunk = audio[start:end]
+        samples = read(chunk)
+
+        transcribedResult = whisper_model.transcribe(samples, fp16=False)
+        text = transcribedResult.get("text", "").strip()
+
+        results.append(
+            {
+                "start_ms": start,
+                "end_ms": end,
+                "start_sec": round(turn.start, 3),
+                "end_sec": round(turn.end, 3),
+                "speaker": speaker,
+                "chunk": chunk,
+                "text": text,
+            }
+        )
+
+        return results
+
+
+def read(k):
+    y = np.array(k.get_array_of_samples())
+    return np.float32(y) / 32768
+
+
+def millisec(timeStr):
+    spl = timeStr.split(":")
+    return (int)((int(spl[0]) * 60 * 60 + int(spl[1]) * 60 + float(spl[2])) * 1000)
+
+
+def speakerIdentificationTool(audio_path):
+    audio, sr = torchaudio.load(audio_path)
+    identified_speakers = set()
+    store = SpeakerStore()
+    events = []
+    try:
+        transcribedAudio = diarize(audio_path)
+        if transcribedAudio:
+            for audioChunk in transcribedAudio:
+                identified_speaker, score = identify_single_audio_chunk(
+                    audioChunk["chunk"], store
+                )
+                if identified_speaker:
+                    final_speaker = identified_speaker
+
+                    events.append(
+                        f"🗣 Identified speaker: {identified_speaker} (confidence {score:.2f})"
+                    )
+                else:
+                    final_speaker = audioChunk["speaker"]
+                    embedding = audiosegment_to_embedding(audioChunk["chunk"])
+                    store.add_embedding(final_speaker, embedding)
+                    events.append(f"🆕 Learned new speaker: {final_speaker}")
+
+                identified_speakers.add(final_speaker)
+
+    except Exception as e:
+        logger.error(f"Error in voiceRecognitionAgent: {e}")
+        return {"success": False, "error": str(e)}
+
+    return {
+        "success": True,
+        "identified_speakers": sorted(identified_speakers),
+        "details": {
+            "total_speakers": len(identified_speakers),
+        },
+        "events": events,
+    }
