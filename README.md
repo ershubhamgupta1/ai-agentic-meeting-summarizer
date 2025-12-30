@@ -9,18 +9,26 @@ sdk_version: 5.44.1
 
 ## Quick Setup
 
-1. Install dependencies:
+
+### 
+
+1. Create virtual environment (Python 3.11)
    ```bash
-   uv sync
-   ```
-   (This creates the virtual environment and installs all dependencies from `pyproject.toml` and `uv.lock`)
+   uv venv --python=python3.11 .venv
+
 
 2. Activate the virtual environment:
    ```bash
    source .venv/bin/activate
    ```
 
-3. Copy the example environment variables and update them:
+3. Install dependencies:
+   ```bash
+   uv sync
+   ```
+   (This creates the virtual environment and installs all dependencies from `pyproject.toml` and `uv.lock`)
+
+4. Copy the example environment variables and update them:
    ```bash
    cp env.example .env
    ```
