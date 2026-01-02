@@ -19,9 +19,14 @@ from collections.abc import AsyncGenerator
 # from functools import wraps
 import gradio as gr
 from dotenv import load_dotenv
+from huggingface_hub import HfApi
 
-from config.settings import settings
+from config.settings import settings, validate_environment
 from main import summaryAgent, voiceRecognitionAgent
+from utils.exceptions import (
+    AudioProcessingError,
+    SpeakerIdentificationError,
+)
 from utils.file_utils import cleanup_temp_file, validate_audio_file
 from utils.logging_config import setup_logging
 
@@ -238,9 +243,16 @@ async def voice_recognition_wrapper(
         )
         yield progress_html + status_html, None
 
-        result = await voiceRecognitionAgent(
-            comparison_audio_path.name,
-        )
+        try:
+            result = await voiceRecognitionAgent(
+                comparison_audio_path.name,
+            )
+        except (SpeakerIdentificationError, AudioProcessingError) as e:
+            error_html = UIComponents.get_error_html(
+                f"Speaker identification failed: {str(e)}"
+            )
+            yield error_html, None
+            return
 
         events = result.get("events", [])
         if events:
@@ -430,9 +442,40 @@ def create_ui() -> gr.Blocks:
     return demo
 
 
+def is_hf_token_valid(token: str | None) -> bool:
+    if not token:
+        return False
+
+    try:
+        api = HfApi(token=token)
+        api.whoami()
+        return True
+    except Exception:
+        return False
+
+
 def main():
     """Main function to launch the application."""
     try:
+        # Validate environment variables at startup
+        if not validate_environment():
+            logger.error(
+                "Missing required environment variables. Application cannot start."
+            )
+            raise SystemExit(
+                "Missing required environment variables. "
+                "Please check your .env file and ensure OPENAI_API_KEY, HUGGINGFACE_HUB_TOKEN is set."
+            )
+
+        if is_hf_token_valid(settings.HUGGINGFACE_HUB_TOKEN):
+            logger.info("✅ Hugging Face token is valid")
+        else:
+            logger.error("❌ Hugging Face token is invalid. Application cannot start.")
+            raise SystemExit(
+                "Hugging Face token is invalid. "
+                "Please check your .env file and ensure HUGGINGFACE_HUB_TOKEN is valid."
+            )
+
         # Setup logging
         logging.basicConfig(
             level=logging.INFO,

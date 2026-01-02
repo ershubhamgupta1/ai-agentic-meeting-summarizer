@@ -18,6 +18,9 @@ class Settings:
     # Whisper Settings
     WHISPER_MODEL: str = os.getenv("WHISPER_MODEL", "base")
 
+    # Hugging Face Settings
+    HUGGINGFACE_HUB_TOKEN: str = os.getenv("HUGGINGFACE_HUB_TOKEN", "")
+
     # App Settings
     MAX_FILE_SIZE: int = int(os.getenv("MAX_FILE_SIZE", "50")) * 1024 * 1024  # 50MB
     SUPPORTED_FORMATS: list = [".mp3", ".wav", ".m4a"]
@@ -47,6 +50,13 @@ def validate_environment() -> bool:
 
     if missing_vars:
         logger.error(f"Missing required environment variables: {missing_vars}")
+        return False
+
+    # Warn if HF token is missing (needed for gated models)
+    if not os.getenv("HUGGINGFACE_HUB_TOKEN"):
+        logger.warning(
+            "HUGGINGFACE_HUB_TOKEN not set. Some models may require authentication."
+        )
         return False
     return True
 

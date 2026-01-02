@@ -2,34 +2,40 @@ import logging
 import os
 from typing import Any
 
-import whisper
 from dotenv import load_dotenv
 
-from config.settings import settings
+from utils.exceptions import TranscriptionError
+from utils.model_factory import ModelFactory
 
 load_dotenv()  # Load environment variables from .env
 
-# Add to top of speechToTextTool.py
-_model_cache = {}
 logger = logging.getLogger(__name__)
 
 
 def speechToTextTool(mp3File: str) -> dict[str, Any]:
-    """Tool to convert mp3 file to text with comprehensive error handling."""
+    """
+    Convert audio file to text using Whisper transcription.
+
+    Args:
+        mp3File: Path to the audio file to transcribe
+
+    Returns:
+        Dictionary with success status, transcribed text, language, and duration
+
+    Raises:
+        TranscriptionError: If transcription fails
+    """
     try:
         if not os.path.exists(mp3File):
             raise FileNotFoundError(f"Audio file not found: {mp3File}")
 
-        if settings.WHISPER_MODEL not in _model_cache:
-            logger.info("Loading Whisper model...")
-            _model_cache[settings.WHISPER_MODEL] = whisper.load_model(
-                settings.WHISPER_MODEL
-            )
-
-        logger.info("model loaded!!!!!!!!!")
-        model = _model_cache[settings.WHISPER_MODEL]
+        logger.info(f"Transcribing audio file: {mp3File}")
+        model = ModelFactory.get_whisper_model()
         transcript = model.transcribe(mp3File)
-        logger.info(f"transcript: {transcript['text']}")
+
+        logger.info(
+            f"Transcription completed. Language: {transcript.get('language', 'unknown')}"
+        )
         return {
             "success": True,
             "text": transcript["text"],
@@ -38,7 +44,7 @@ def speechToTextTool(mp3File: str) -> dict[str, Any]:
         }
     except FileNotFoundError as e:
         logger.error(f"File error: {e}")
-        return {"success": False, "error": str(e)}
+        raise TranscriptionError(f"Audio file not found: {mp3File}") from e
     except Exception as e:
         logger.error(f"Transcription error: {e}")
-        return {"success": False, "error": "Transcription failed"}
+        raise TranscriptionError(f"Transcription failed: {e}") from e

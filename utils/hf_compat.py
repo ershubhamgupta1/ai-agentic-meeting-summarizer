@@ -13,8 +13,9 @@ def patch_hf_hub_download() -> None:
     Compatibility patch for older libraries (pyannote / speechbrain)
     that still pass `use_auth_token` to hf_hub_download.
     """
-    os.environ["HF_TOKEN"] = os.getenv("HUGGINGFACE_HUB_TOKEN")
-
+    token = os.getenv("HUGGINGFACE_HUB_TOKEN")
+    if token:
+        os.environ["HF_TOKEN"] = token
     _original_hf_hub_download = huggingface_hub.hf_hub_download
 
     @wraps(_original_hf_hub_download)
