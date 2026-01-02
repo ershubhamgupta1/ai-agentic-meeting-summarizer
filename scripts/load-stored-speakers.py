@@ -28,10 +28,10 @@ async def LoadSpeakers():
     speakersData = json.loads(speakersData)
 
     for speaker in speakersData["data"]:
-        audio_path = DATA_DIR / speaker["fileName"]
-        logger.info("Ready to add speaker!!!!!!!!!")
-        await addSpeakerInStoreTool(audio_path, speaker["speakerName"])
-        logger.info("speaker added!!!!!!!!!")
+        speakerFiles = speaker["fileNames"]
+        for speakerFile in speakerFiles:
+            audio_path = DATA_DIR / speakerFile
+            await addSpeakerInStoreTool(audio_path, speaker["speakerName"])
 
 
 async def main() -> None:

@@ -9,56 +9,53 @@ sdk_version: 5.44.1
 
 ## Quick Setup
 
-
-### 
-
-1. Create virtual environment (Python 3.11)
-   ```bash
-   uv venv --python=python3.11 .venv
+   1. Create virtual environment (Python 3.11)
+      ```bash
+      uv venv --python=python3.11 .venv
 
 
-2. Activate the virtual environment:
-   ```bash
-   source .venv/bin/activate
-   ```
+   2. Activate the virtual environment:
+      ```bash
+      source .venv/bin/activate
+      ```
 
-3. Install dependencies:
-   ```bash
-   uv sync
-   ```
-   (This creates the virtual environment and installs all dependencies from `pyproject.toml` and `uv.lock`)
+   3. Install dependencies:
+      ```bash
+      uv sync
+      ```
+      (This creates the virtual environment and installs all dependencies from `pyproject.toml` and `uv.lock`)
 
-4. Copy the example environment variables and update them:
-   ```bash
-   cp env.example .env
-   ```
-   Fill in `OPENAI_API_KEY` and adjust any other values as needed.
+   4. Copy the example environment variables and update them:
+      ```bash
+      cp env.example .env
+      ```
+      Fill in `OPENAI_API_KEY` and adjust any other values as needed.
 
-4. Alternative setup (macOS / Linux):
-   ```bash
-   bash scripts/setup.sh
-   ```
-   Alternative setup (Windows - CMD or PowerShell):
-   ```powershell
-   setup.cmd
-   ```
-   (This runs `scripts/setup.ps1` with the necessary execution policy bypass.)
+   5. Alternative setup (macOS / Linux):
+      ```bash
+      bash scripts/setup.sh
+      ```
+      Alternative setup (Windows - CMD or PowerShell):
+      ```powershell
+      setup.cmd
+      ```
+      (This runs `scripts/setup.ps1` with the necessary execution policy bypass.)
 
-5. Launch the Gradio UI:
-   ```bash
-   python ui.py
-   ```
+   6. Launch the Gradio UI:
+      ```bash
+      python ui.py
+      ```
 
 
 
-Environment variables:
+   Environment variables:
 
-- `OPENAI_API_KEY` (required) – OpenAI credentials used by the summarizer.
-- `OPENAI_MODEL`, `OPENAI_TEMPERATURE`, `WHISPER_MODEL` – optional model overrides.
-- `MAX_FILE_SIZE` – max upload size in MB (defaults to 50).
-- `PORT` – port for the Gradio server (defaults to 7860).
-- `GRADIO_SHARE` – set `true` to generate a share link when running locally.
-- `LOG_LEVEL`, `LOG_FILE` – optional logging configuration.
+   - `OPENAI_API_KEY` (required) – OpenAI credentials used by the summarizer.
+   - `OPENAI_MODEL`, `OPENAI_TEMPERATURE`, `WHISPER_MODEL` – optional model overrides.
+   - `MAX_FILE_SIZE` – max upload size in MB (defaults to 50).
+   - `PORT` – port for the Gradio server (defaults to 7860).
+   - `GRADIO_SHARE` – set `true` to generate a share link when running locally.
+   - `LOG_LEVEL`, `LOG_FILE` – optional logging configuration.
 
 
 ## Scripts
@@ -84,37 +81,36 @@ Environment variables:
       python scripts/load-stored-speakers.py
 
 
-Steps to create app from scratch
+## Steps to create app from scratch
 
 
-Agentic AI setup
+   Agentic AI setup
 
-1) install cursor AI IDE
-2) create directory in any folder for example : mkdir sample-agentic-app
-3) install uv : curl -Ls https://astral.sh/uv/install.sh | sh (close the terminal and open it again to active it)
-4) run uv sync to create .vnenv file: uv sync
-5) create project.tom file that will work as package.json using : uv init
-6) run this command to activate jupyter : source .venv/bin/activate  # macOS/Linux
-7) create notebook file: either using : jupyter notebook or manually create file using cursor IDE
-8) create agent.py file to actually put your code for production 
-9) to install and add package in toml file: uv add OpenAI
-10) create account on huggingface using url : https://huggingface.co and create token( click on avatar and list will be visible)
-11) go to  cursor ide terminal and run the command: gradio deploy (it will ask some questions like token, space etc )
-12) create requirments.txt and packages.txt for dependencies on hugging face otherwise at hugging face portal u will get module not found error: uv pip freeze > requirements.txt
-13) crete packages.txt for dependencies like ffmpeg manually    
-14) sometimes u get issue of dependency at hugging face due to some incompatible versions with other versions so u can try running these dependencies on local first otherwise it takes time if u directly do it on hugging face: python3 -m pip install -r requirements.txt
+   1) install cursor AI IDE
+   2) create directory in any folder for example : mkdir sample-agentic-app
+   3) install uv : curl -Ls https://astral.sh/uv/install.sh | sh (close the terminal and open it again to active it)
+   4) run uv sync to create .vnenv file: uv sync
+   5) create project.tom file that will work as package.json using : uv init
+   6) run this command to activate jupyter : source .venv/bin/activate  # macOS/Linux
+   7) create notebook file: either using : jupyter notebook or manually create file using cursor IDE
+   8) create agent.py file to actually put your code for production 
+   9) to install and add package in toml file: uv add OpenAI
+   10) create account on huggingface using url : https://huggingface.co and create token( click on avatar and list will be visible)
+   11) go to  cursor ide terminal and run the command: gradio deploy (it will ask some questions like token, space etc )
+   12) create requirments.txt and packages.txt for dependencies on hugging face otherwise at hugging face portal u will get module not found error: uv pip freeze > requirements.txt
+   13) crete packages.txt for dependencies like ffmpeg manually    
+   14) sometimes u get issue of dependency at hugging face due to some incompatible versions with other versions so u can try running these dependencies on local first otherwise it takes time if u directly do it on hugging face: python3 -m pip install -r requirements.txt
 
-Notes
+   Notes
 
-1) jupyter helps to give web interface to write run python code
-2) just to install the package we can run : uv pip install OpenAI 
-3) to install and add package in toml file: uv add OpenAI
-4) notebook we use just for testing and run the code locally but usually not in prod
-5) if you are facing dependency conflict/incompatible issue then run : python3 -m piptools compile requirements.in
-6) install packages locally : python3 -m venv .venv && source .venv/bin/activate && uv pip install -r requirements.txt
+   1) jupyter helps to give web interface to write run python code
+   2) just to install the package we can run : uv pip install OpenAI 
+   3) to install and add package in toml file: uv add OpenAI
+   4) notebook we use just for testing and run the code locally but usually not in prod
+   5) if you are facing dependency conflict/incompatible issue then run : python3 -m piptools compile requirements.in
+   6) install packages locally : python3 -m venv .venv && source .venv/bin/activate && uv pip install -r requirements.txt
 
-
-commands:
+## Some important commands:
 
 - Install dependencies on existing project: `uv sync`
 - Install ffmpeg: `brew install ffmpeg`
@@ -123,8 +119,18 @@ commands:
 - Install and add package in toml file: `uv add OpenAI`
 - Log in to Hugging Face: `huggingface-cli login`
 - Deploy to Hugging Face Spaces: `gradio deploy`
+- convert m4a file to wav: 
 
-Ruff linting and formatting:
+   ffmpeg -y \
+   -i stored-speakers/shubham-voice-to-identify.wav \
+   -ac 1 \
+   -ar 16000 \
+   -acodec pcm_s16le \
+   -af "silenceremove=1:0:-50dB,aresample=16000" \
+   stored-speakers/shubham-voice-to-identify_16k.wav
+
+
+## Ruff linting and formatting:
 
 - Check for lint issues: `uv run ruff check .`
 - Auto-fix lint issues: ` uv run ruff check --fix .`
