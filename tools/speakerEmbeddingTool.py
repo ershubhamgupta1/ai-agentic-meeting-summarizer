@@ -11,6 +11,8 @@ from pyannote.audio import Inference, Pipeline
 from pydub import AudioSegment
 from sklearn.metrics.pairwise import cosine_similarity
 
+from utils.file_utils import ensure_wav_16k_mono
+
 # =========================
 # CONFIGURATION
 # =========================
@@ -218,6 +220,7 @@ def millisec(timeStr):
 
 
 def speakerIdentificationTool(audio_path):
+    audio_path = ensure_wav_16k_mono(audio_path)
     audio, sr = torchaudio.load(audio_path)
     identified_speakers = set()
     events = []

@@ -1,12 +1,16 @@
 {
     "data": [
         {
-            "speakerName": "Tom",
-            "fileNames": ["tom-speaker.wav"]
+            "speakerName": "Madhuri",
+            "fileNames": ["madhuri-speaker-1.wav", "madhuri-speaker-2.wav"]
         },
         {
             "speakerName": "Shubham",
             "fileNames": ["shubham-speaker-2.wav", "shubham-speaker-3.wav"]
+        },
+        {
+            "speakerName": "Tom",
+            "fileNames": ["tom-speaker.wav"]
         }
     ]
 }
