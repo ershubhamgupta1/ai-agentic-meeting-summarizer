@@ -31,12 +31,12 @@ async def summaryAgent(
         input_path: Path to the audio file to process
 
     Yields:
-        Tuple of (status_message, accumulated_result)
+        Tuple of (status_message, accumulated_markdown_summary)
     """
     try:
-        yield "🧠 Transcribe started...", None
+        yield "🧠 Transcription started...", None
 
-        # Transcribe audio
+        # 1) Transcribe audio
         logger.info(f"Transcribing audio file: {input_path}")
         try:
             transcript_result = speechToTextTool(input_path)
@@ -53,7 +53,31 @@ async def summaryAgent(
 
         yield "✅ Transcription completed.", None
 
-        # Summarize transcript
+        # 2) Identify speakers from the original audio
+        yield "🗣️ Identifying speakers from the meeting audio...", None
+        speakers: list[str] = []
+        speaker_result = speakerIdentificationTool(input_path)
+
+        if speaker_result.get("success"):
+            speakers = speaker_result.get("identified_speakers", []) or []
+            logger.info(f"Identified speakers: {speakers}")
+
+            if speakers:
+                yield (
+                    "✅ Speaker identification completed: "
+                    + ", ".join(sorted(speakers)),
+                    None,
+                )
+            else:
+                yield "⚠️ No known speakers identified in the audio.", None
+        else:
+            error_msg = speaker_result.get(
+                "error", "Unknown speaker identification error"
+            )
+            logger.warning(f"Speaker identification did not succeed: {error_msg}")
+            yield f"⚠️ Speaker identification issue: {error_msg}", None
+
+        # 3) Refine transcript
         logger.info("Summarizing transcript...")
         yield "🧠 Refining transcript...", None
 
@@ -68,11 +92,29 @@ async def summaryAgent(
         logger.info(f"original transcript word : {transcript_result['text']}")
         logger.info(f"Refined transcript word : {refined_transcript}")
 
+        # 4) Call summarization agent
         summary = summaryTool(refined_transcript)
         yield "✅ Summary generation completed.", None
 
-        # Generate markdown
+        # 5) Generate markdown from structured summary
         marked_down_data = generate_markdown_summary(summary)
+
+        # 6) Enrich markdown with detected speakers (if any)
+        if speakers:
+            detected_speakers_md = "\n".join(f"- `{spk}`" for spk in sorted(speakers))
+            speakers_section = f"## 🗣️ Detected Speakers\n{detected_speakers_md}\n\n"
+
+            # Inject the speakers section just after the main title if present
+            if "# 📋 Meeting Summary" in marked_down_data:
+                marked_down_data = marked_down_data.replace(
+                    "# 📋 Meeting Summary",
+                    "# 📋 Meeting Summary\n\n" + speakers_section,
+                    1,
+                )
+            else:
+                # Fallback: prepend the section at the top
+                marked_down_data = speakers_section + marked_down_data
+
         yield "✅ Summary complete.", marked_down_data
 
     except Exception as e:

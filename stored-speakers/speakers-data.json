@@ -6,7 +6,13 @@
         },
         {
             "speakerName": "Shubham",
-            "fileNames": ["shubham-speaker-2.wav", "shubham-speaker-3.wav"]
+            "fileNames": [
+                "shubham-speaker-1.wav", 
+                "shubham-speaker-2.wav", 
+                "shubham-speaker-3.wav", 
+                "shubham-speaker-4.wav",
+                "shubham-speaker-5.wav"
+            ]
         },
         {
             "speakerName": "Tom",

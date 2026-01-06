@@ -58,6 +58,81 @@ sdk_version: 5.44.1
    - `LOG_LEVEL`, `LOG_FILE` – optional logging configuration.
 
 
+## Project Structure
+
+- **`config/`**: Centralized application configuration.
+  - **`settings.py`**: Environment-driven settings (API keys, ports, file size limits, etc.).
+- **`models/`**: Pydantic data models and schemas.
+  - **`meeting_schema.py`**: JSON schema for structured meeting summaries used by `summaryTool`.
+- **`tools/`**: Core AI tools and processing pipelines.
+  - **`speechToTextTool.py`**: Converts meeting audio to text using Whisper.
+  - **`textRefiningTool.py`**: Cleans and refines raw transcripts before summarization.
+  - **`summaryTool.py`**: Calls the LLM to generate a structured JSON summary of the meeting.
+  - **`speakerEmbeddingTool.py`**: Handles speaker diarization, embedding extraction, and speaker identification.
+- **`utils/`**: Helper utilities and shared infrastructure.
+  - **`file_utils.py`**: File validation, conversion to 16k mono WAV, and simple I/O helpers.
+  - **`hf_compat.py`**: Hugging Face compatibility shim for older libraries and token handling.
+  - **`logging_config.py`**: Central logging configuration.
+  - **`openai_client.py`**: Singleton OpenAI client wrapper.
+  - **`model_factory.py`**: Lazy-loading factory for Hugging Face and Whisper models.
+- **`sample-meetings/`**: Example meeting audio files you can use for local testing of the meeting summarizer.
+- **`stored-speakers/`**: Enrollment data for known speakers.
+  - **`speakers-data.json`**: Configuration describing each enrolled speaker and their enrollment audio files.
+  - `*.wav` / `*.m4a`: Clean enrollment samples per speaker, used to build the speaker embedding store.
+  - **`speaker_enrollment_samples.md`**: Documentation and notes about how speaker samples were recorded and used.
+- **`scripts/`**: Utility scripts.
+  - **`load-stored-speakers.py`**: Preprocesses and registers speakers from `stored-speakers/` into the embedding store.
+- **`ui.py`**: Gradio-based web UI with two tabs:
+  - **Meeting Summarizer**: Upload a meeting recording and get a structured, Markdown-formatted summary.
+  - **Voice Recognition**: Upload a short voice clip to match against enrolled speakers.
+- **`main.py`**: Orchestrates the end-to-end pipeline (`summaryAgent` and `voiceRecognitionAgent`).
+
+
+## Tools & Workflows
+
+### Meeting Summarizer (voice → transcript → summary)
+
+- **UI Tab**: `Meeting Summarizer`
+- **Input type**:
+  - Single **audio file** of the full meeting.
+  - Supported formats: **`.mp3`**, **`.wav`**, **`.m4a`**.
+  - Recommended properties:
+    - Clear speech from participants with minimal background noise.
+    - Duration: from a few minutes up to the configured `MAX_FILE_SIZE` limit (default 50 MB).
+- **What the tool does**:
+  1. Converts audio to text using **Whisper**.
+  2. Optionally refines/cleans the transcript.
+  3. Generates a **structured JSON summary** using the `MeetingSummary` schema.
+  4. Renders a **Markdown summary** with agenda, participants, topics, key points, action items, etc.
+  5. Runs **speakerIdentificationTool** on the original audio to detect which enrolled speakers participated, and injects them into the “Detected Speakers” section at the top of the summary.
+- **Best practices**:
+  - Use mono or stereo recordings with distinct voices.
+  - Avoid very low-volume or highly compressed audio.
+  - For very short clips (< 5–10 seconds), use the **Voice Recognition** tab instead.
+
+
+### Voice Recognition (who is speaking?)
+
+- **UI Tab**: `Voice Recognition`
+- **Input type**:
+  - Single **short voice sample** from one speaker.
+  - Supported formats: **`.mp3`**, **`.wav`**, **`.m4a`**.
+  - Recommended duration: **≥ 2–3 seconds** of clear speech (longer gives better results).
+- **What the tool does**:
+  1. Converts the uploaded file to a **16kHz mono WAV** if needed.
+  2. Uses **pyannote** diarization + embedding model to extract speaker embeddings.
+  3. Compares the sample to the enrolled speakers stored in `speaker_store.pkl` (populated via `scripts/load-stored-speakers.py`).
+  4. Returns:
+     - `identified_speakers`: list of matching known speakers (e.g., `["Shubham", "Madhuri"]`).
+     - `events`: step-by-step log messages shown in the UI (including confidence scores).
+- **Audio requirements & tips**:
+  - Use a **single speaker** per sample.
+  - Avoid heavy background noise or music.
+  - If the audio is **too short** or contains no clear speech, you will see a friendly error like:
+    > “Audio file is too short… Please use a longer audio file for speaker identification.”
+  - Make sure you have run `python scripts/load-stored-speakers.py` at least once to build the speaker store.
+
+
 ## Scripts
 
    ### `load-stored-speakers.py`

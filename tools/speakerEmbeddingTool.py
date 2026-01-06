@@ -442,6 +442,7 @@ def speakerIdentificationTool(audio_path: str) -> dict:
 
 async def addSpeakerInStoreTool(audio_path: str, speakerName: str):
     try:
+        audio_path = ensure_wav_16k_mono(audio_path)
         diarized = diarize(audio_path)
 
         if not diarized:
