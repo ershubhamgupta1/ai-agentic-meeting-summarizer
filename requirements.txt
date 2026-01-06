@@ -48,7 +48,7 @@ matplotlib==3.9.4
 mdurl==0.1.2
 ml_dtypes==0.5.3
 namex==0.1.0
-numpy==2.0.2
+numpy==1.26.4
 openai==1.107.0
 opt_einsum==3.4.0
 optree==0.17.0
@@ -72,6 +72,7 @@ rich==14.1.0
 ruamel.yaml==0.18.15
 ruamel.yaml.clib==0.2.12
 ruff==0.12.12
+scikit-learn
 semantic-version==2.10.0
 shellingham==1.5.4
 speechbrain==0.5.16
@@ -98,3 +99,6 @@ Werkzeug==3.1.3
 git+https://github.com/openai/whisper.git
 wrapt==1.17.3
 zipp==3.23.0
+gtts>=2.5.4
+pyannote-audio==3.1.1
+soundfile>=0.13.1

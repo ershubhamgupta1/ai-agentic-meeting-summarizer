@@ -192,7 +192,7 @@ sdk_version: 5.44.1
 - Activate Virtual Environment: `source .venv/bin/activate`
 - Run project locally: `python3 ui.py`
 - Install and add package in toml file: `uv add OpenAI`
-- Log in to Hugging Face: `huggingface-cli login`
+- Log in to Hugging Face: `hf auth login`
 - Deploy to Hugging Face Spaces: `gradio deploy`
 - convert m4a file to wav: 
 
