@@ -1,3 +1,4 @@
+<img width="2876" height="1448" alt="image" src="https://github.com/user-attachments/assets/b76018ee-59cc-4300-9387-b3fcbb236926" />
 
 Designed and developed an Agentic AI-powered Meeting Summarization platform that automatically processes audio and video recordings to generate structured meeting insights, summaries, key discussion points, decisions, and action items.
 
@@ -68,7 +69,7 @@ sdk_version: 5.44.1
 
    6. Launch the Gradio UI:
       ```bash
-      python ui.py
+      uv run python ui.py
       ```
 
 
