@@ -1,4 +1,6 @@
 <img width="2876" height="1448" alt="image" src="https://github.com/user-attachments/assets/b76018ee-59cc-4300-9387-b3fcbb236926" />
+<img width="2880" height="1532" alt="image" src="https://github.com/user-attachments/assets/7553d89c-45ac-4a15-abe8-1cc4cc54bc91" />
+<img width="2830" height="1534" alt="image" src="https://github.com/user-attachments/assets/c0ca3c2a-bcb1-4171-979e-15adc2384758" />
 
 Designed and developed an Agentic AI-powered Meeting Summarization platform that automatically processes audio and video recordings to generate structured meeting insights, summaries, key discussion points, decisions, and action items.
 
