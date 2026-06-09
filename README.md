@@ -1,3 +1,28 @@
+
+Designed and developed an Agentic AI-powered Meeting Summarization platform that automatically processes audio and video recordings to generate structured meeting insights, summaries, key discussion points, decisions, and action items.
+
+The application leverages Large Language Models (LLMs), AI Agents, speech-to-text processing, and Retrieval-Augmented workflows to transform lengthy meeting recordings into concise and actionable summaries, significantly reducing manual note-taking efforts.
+
+Key Features:
+• Audio and video meeting ingestion
+• Automated speech-to-text transcription
+• Agentic AI workflow for content understanding and reasoning
+• Intelligent meeting summarization
+• Extraction of key discussion points and decisions
+• Action item identification and tracking
+• Context-aware information retrieval
+• Scalable architecture for processing large meeting recordings
+
+Technologies Used:
+Python, Generative AI, Agentic AI, LLMs, RAG, Cloud Services.
+
+Impact:
+• Reduced manual meeting documentation effort
+• Improved knowledge sharing and meeting productivity
+• Enabled quick access to important decisions and action items
+• Demonstrated practical implementation of Agentic AI in enterprise collaboration workflows
+
+
 ---
 title: sample-app
 app_file: ui.py
